@@ -1,7 +1,7 @@
 # kkbox_churn_prediction
 * Course project of Predictive Analysis 2017 Fall NYU
 * The data set is from Kaggle [WSDM - KKBox's Churn Prediction Challenge](https://www.kaggle.com/c/kkbox-churn-prediction-challenge)
-## Attribute Select
+## Attribute Selection
 #### transaction.csv (last transaction of each member)
 - payment_method
 - payment_plan_days
@@ -25,7 +25,7 @@ select daily logs back to a month from last daily record
 - partial_75
 - partial_985
 - partial_100
-- unique
+- partial_unique
 
 #### Trend of each category (logistic regression)
 - trend_25
@@ -37,4 +37,4 @@ select daily logs back to a month from last daily record
 - trend_total
 
 #### Continuous subscription interval
-- sub_interval
+- sbp_interval
