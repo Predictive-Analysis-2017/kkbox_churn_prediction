@@ -1,0 +1,22 @@
+Data extraction from date
+
+There are 2 date information involved in transactions.csv which are the key fields to determine the churn/renewal state:
+ - transaction_date
+ - membership_expire_date
+
+Extract information from these two fields based on what we have:
+1. Length of current subscription
+2. Elapsed time since last renewal
+3. Elapsed time since last suspension
+4. Average suspension length (in number of days)
+5. Average number of days the previous subscriptions are renewed before expiry date
+6. How many days before the expiry date, the previous subscription was renewed
+
+Summery:
+1 maybe the most important one; 2, 3, 6 are related to the previous subscription period; 4, 5 are averaged suspension length and revewal before expiration.
+
+Not really sure:
+7. The month of contract expiration
+
+Reference:
+http://www.sciencedirect.com/science/article/pii/S0957417406002806
