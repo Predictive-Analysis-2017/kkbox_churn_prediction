@@ -1,0 +1,42 @@
+ML Model Implementation
+1. Decision Tree:
+   - Steps:
+   Form data into label and feature vectors, then choose transformers (e.g. PCA) to extract features into a new feature column,
+   and also tranform the label column. Then put the transformed label and feature into Decision Tree Model. 
+   Reference: 
+   https://mapr.com/blog/churn-prediction-sparkml/
+   - Same story for random forest - a case of decision tree.
+
+2. Linear SVM
+   - In SVM, we do not have to use feature to build a tree, we just input all of the features and the label into the 
+     model, so we have to convert the data file into a specific format that Spark built-in ML tools can read.
+   - Steps:
+   1) Convert data into libsvm format. 
+    - About Libsvm format:
+   <label><index1>:<value1><index2>:<value2>...
+   (index means feature)
+    - An example I found:
+   https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/a3a
+   Above example can be found in:
+   https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html
+   e.g. +1 1:0.7 2:1 3:1 translates to:
+   Assign to class +1, the point (0.7,1,1).
+    - Convert other data format to libsvm format:
+   https://stats.stackexchange.com/questions/61328/libsvm-data-format
+   
+   2) Input libsvm format data into Linear SVM Model, train to get the model and predict using the model
+      https://spark.apache.org/docs/2.2.0/ml-classification-regression.html#linear-support-vector-machine
+      - Also good examples:
+      http://web.cs.ucla.edu/~mtgarip/linear.html
+      
+3. Logistic Regression
+   - Data pre-processing is similar to SVM.
+   - Steps:
+   1) Convert data into libsvm format.
+   2) Input libsvm format data into Logistic Regression Model, train to get the model and predict using the model
+   https://spark.apache.org/docs/2.2.0/ml-classification-regression.html#logistic-regression
+   - Also a good example from:
+   http://web.cs.ucla.edu/~mtgarip/linear.html
+
+Similarly, except decision tree models, we have to first convert data into libsvm format, then input the data
+to train via Spark built-in ML tools to get the predictive models. We can further try Gradient Boost and other models.
