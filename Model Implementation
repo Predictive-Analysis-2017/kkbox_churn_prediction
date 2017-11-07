@@ -23,6 +23,7 @@ ML Model Implementation
    Assign to class +1, the point (0.7,1,1).
     - Convert other data format to libsvm format:
    https://stats.stackexchange.com/questions/61328/libsvm-data-format
+   https://www.csie.ntu.edu.tw/~cjlin/libsvm/faq.html#f307
    
    2) Input libsvm format data into Linear SVM Model, train to get the model and predict using the model
       https://spark.apache.org/docs/2.2.0/ml-classification-regression.html#linear-support-vector-machine
