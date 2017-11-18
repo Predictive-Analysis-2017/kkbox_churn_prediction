@@ -38,3 +38,11 @@ select daily logs back to a month from last daily record
 
 #### Continuous subscription interval
 - sbp_interval
+
+#### Feature from transaction_date and membership_expire_dat
+1. Length of current subscription
+2. Elapsed time since last renewal
+3. Elapsed time since last suspension
+4. Average suspension length (in number of days)
+5. Average number of days the previous subscriptions are renewed before expiry date
+6. The month of contract expiration
