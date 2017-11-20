@@ -116,7 +116,8 @@ object transaction_gen {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("Simple Application").setMaster("local[*]")
     val sc = new SparkContext(conf)
-    val data = sc.textFile("/Users/jimmy/Desktop/PA/raw_data/transactions.csv")
+    //val data = sc.textFile("/Users/jimmy/Desktop/PA/raw_data/transactions.csv")
+    val data = sc.textFile("/user/hungwei/transactions.csv")
     val header = data.first()
 
     // tran: (msno, List[(msno, is_auto_renew, transaction_data, membership_expire_date, is_cancel)]
