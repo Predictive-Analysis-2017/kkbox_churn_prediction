@@ -19,6 +19,7 @@ import org.apache.spark.ml.classification.DecisionTreeClassifier
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
 import org.apache.spark.sql.functions.rand
+import scala.util.Random
 
 object pa_final {
   def main(args: Array[String]) {
@@ -109,27 +110,96 @@ object pa_final {
     /* FINISH TESTING */
 
     /* PREPARE DATA */
+  
+    def cityMappint(city: Int): Int = {
+      city
+    } 
+    def regMapping(reg: Int): Int = {
+      if(reg == 9){
+        0
+      }else if(reg == 3){
+        1
+      }else if(reg == 4){
+        2
+      }else if(reg == 7){
+        3
+      }else if(reg == 16){
+        4
+      }else if(reg == 13){
+        5
+      }else if(reg == 10){
+        6
+      }else{
+        7
+      }
+    }
+
+    val cityRdd = membersRddClean1.map{line => val data = line.split(",")
+      data(1)
+    }.distinct()
+    println("city count: " + cityRdd.count())
+    cityRdd.take(25).foreach(println)
+    val regRdd = membersRddClean1.map{line => val data = line.split(",")
+      data(4)
+    }.distinct()
+    println("reg count: " + regRdd.count())
+    regRdd.take(25).foreach(println)
+
 
     // map member data to (msno, city, bd, register_via)
     val FeatureRdd1 = membersRddClean1.map{line => val data = line.split(",")
-      (data(0), (data(1), data(2), data(4)))
-    } 
+      val city = data(1)
+      var sparse_city = Array.fill[Double](22)(0.0)
+      sparse_city(city.toInt - 1) = 1.0
+      var reg = data(4)
+      var sparse_reg = Array.fill[Double](8)(0.0)
+      sparse_reg(regMapping(reg.toInt)) = 1.0 
+       
+      //(data(0), (data(1), data(2), data(4)))
+      (data(0), (sparse_city, data(2), sparse_reg))
+    }
+
     // map train data to (msno, is_churn)
     val FeatureRdd2 = trainRddClean1.map{line => val data = line.split(",")
       (data(0), (data(1)))
     }
 
+    //use msno to join tables
     val combinedFeatures = FeatureRdd1.join(FeatureRdd2)
     var combinedFeaturesCount = combinedFeatures.count()
     println("combined count = " + combinedFeaturesCount)
 
     val churnRdd = combinedFeatures.filter(line => line._2._2.toInt == 1).count()
     val notChurnRdd = combinedFeatures.filter(line => line._2._2.toInt == 0).count()
-    println("Churn count: " + churnRdd);
-    println("NOT Churn count: " + notChurnRdd);
+    println("Churn count: " + churnRdd)
+    println("NOT Churn count: " + notChurnRdd)
 
-    var data = combinedFeatures.map{line => val data = line
-      val c = Vectors.dense(data._2._1._1.toDouble, data._2._1._2.toDouble, data._2._1._3.toDouble)
+    //since the data is so unbalanced, we need do resampling
+    val combinedFeaturesEvenSize = combinedFeatures.map{line => val data = line
+      val rg = new scala.util.Random
+      val f = rg.nextDouble
+      (line, f)
+    }.filter{line => val data = line
+      if(data._1._2._2.toInt == 1){
+        true
+      }else{
+        if(data._2 >= 0.07){
+          false
+        }else{
+          true
+        }
+      } 
+    }.map(line => line._1)
+
+    val churnRdd2 = combinedFeaturesEvenSize.filter(line => line._2._2.toInt == 1).count()
+    val notChurnRdd2 = combinedFeaturesEvenSize.filter(line => line._2._2.toInt == 0).count()
+    println("Churn count: " + churnRdd2)
+    println("NOT Churn count: " + notChurnRdd2)
+
+    //it's very stupid, should find how to write this elegantly...
+    var data = combinedFeaturesEvenSize.map{line => val data = line
+      //val c = Vectors.dense(data._2._1._1.toDouble, data._2._1._2.toDouble, data._2._1._3.toDouble)
+      val c = Vectors.dense(data._2._1._1(0), data._2._1._1(1), data._2._1._1(2), data._2._1._1(3), data._2._1._1(4), data._2._1._1(5), data._2._1._1(6), data._2._1._1(7), data._2._1._1(8), data._2._1._1(9), data._2._1._1(10), data._2._1._1(11), data._2._1._1(12), data._2._1._1(13), data._2._1._1(14), data._2._1._1(15), data._2._1._1(16), data._2._1._1(17), data._2._1._1(18), data._2._1._1(19), data._2._1._1(20), data._2._1._1(21), data._2._1._2.toDouble, data._2._1._3(0), data._2._1._3(1), data._2._1._3(2), data._2._1._3(3), data._2._1._3(4), data._2._1._3(5), data._2._1._3(6), data._2._1._3(7))
       var y = data._2._2.toInt
       LabeledPoint(y, c)
     }.cache()
