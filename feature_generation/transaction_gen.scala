@@ -26,8 +26,8 @@ object transaction_gen {
   }
 
   def suspension_index(index: Int, list: List[(String, String, String, String, String)]): (Int) = {
-    if (index > list.length - 1) (index)
-    else if (list(index)._2 == "0" || list(index)._5 == "1") (index)
+    if (index > list.length - 1) index
+    else if (list(index)._2 == "0" || list(index)._5 == "1") index
     else suspension_index(index + 1, list)
   }
 
@@ -86,8 +86,8 @@ object transaction_gen {
     while( index < list.length){
       val next_index = renew_index(index, list)
       // find previous expiration date > current transaction date
-      if (get_days(list(next_index)._4, cur._3) > 0) {
-        if (next_index < list.length) {
+      if (next_index < list.length){
+        if (get_days(list(next_index)._4, cur._3) > 0) {
           expire_list_buffer += get_days(list(next_index)._4, cur._3)
           cur = list(next_index)
           index = next_index + 1
@@ -116,8 +116,8 @@ object transaction_gen {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("Simple Application").setMaster("local[*]")
     val sc = new SparkContext(conf)
-    //val data = sc.textFile("/Users/jimmy/Desktop/PA/raw_data/transactions.csv")
-    val data = sc.textFile("/user/hungwei/transactions.csv")
+    val data = sc.textFile("/Users/jimmy/Desktop/PA/raw_data/transactions.csv")
+//    val data = sc.textFile("/user/hungwei/transactions.csv")
     val header = data.first()
 
     // tran: (msno, List[(msno, is_auto_renew, transaction_data, membership_expire_date, is_cancel)]
@@ -126,9 +126,9 @@ object transaction_gen {
     // each key sort transaction_data desc
     val tran1 = tran.mapValues(iter => iter.toList.sortWith(_._3 > _._3))
 
+    // trans = (id, List(9 features))
     val tran2 = tran1.map( x => (x._1, get_tuple(x._2)))
 
     tran2.take(10).foreach(println(_))
   }
 }
-
