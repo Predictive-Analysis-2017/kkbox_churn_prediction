@@ -8,24 +8,30 @@
 - plan_list_price
 - is_auto_renew
 - is_cancel
+- month of subscription
 
 #### member.csv
 - city
 - bd
 - register_via
 
-#### user_log.csv
-- total_sec
-
 ## Feature Generation
-select daily logs back to a month from last daily record
-#### Partial of each category (avg by month)
+User listening behavior features, trace daily logs back to 60 days from last daily record from user_log.csv
+#### Partial of each category (avg)
 - partial_25
 - partial_50
 - partial_75
 - partial_985
 - partial_100
 - partial_unique
+- total_sec
+- partial_25_standard deviation
+- partial_50_standard deviation
+- partial_75_standard deviation
+- partial_985_standard deviation
+- partial_100_standard deviation
+- partial_unique_standard deviation
+- total_sec_standard deviation
 
 #### Trend of each category (logistic regression)
 - trend_25
@@ -36,13 +42,14 @@ select daily logs back to a month from last daily record
 - trend_unique
 - trend_total
 
+User subscription behavior, from transactions.csv
 #### Continuous subscription interval
-- sbp_interval
-
-#### Feature from transaction_date and membership_expire_dat
-1. Length of current subscription
-2. Elapsed time since last renewal
-3. Elapsed time since last suspension
-4. Average suspension length (in number of days)
-5. Average number of days the previous subscriptions are renewed before expiry date
-6. The month of contract expiration
+- elapsed days since last renewal
+- elapsed days since last suspension
+- days of renewal before expiration
+- elapsed days since last renewal_mean
+- elapsed days since last suspension_mean
+- days of renewal before expiration_mean
+- elapsed days since last renewal_standard deviation
+- elapsed days since last suspension_standard deviation
+- days of renewal before expiration_standard deviation
