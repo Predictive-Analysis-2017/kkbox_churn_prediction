@@ -1,0 +1,233 @@
+train rdd count = 992931
+transaction rdd count = 21547746
+user logs rdd count = 392106543
+members rdd count = 5116194
+members rdd count after removing outlier - age = 1694087
+members rdd count - not valid = 3422107
+male members rdd count = 902851
+female members rdd count = 858565
+members without gender count = 3354778
+male avg age = 29.49720313472753
+female avg age = 29.301408917578755
+city count: 21
+21
+15
+18
+6
+9
+3
+12
+4
+19
+7
+16
+22
+13
+1
+10
+8
+14
+20
+5
+17
+11
+reg count: 7
+9
+3
+4
+7
+16
+13
+10
+tran count: 40
+4
+21
+16
+39
+5
+22
+17
+18
+6
+23
+19
+7
+24
+8
+30
+25
+31
+26
+27
+32
+28
+33
+10
+34
+11
+combined count = 876143
+(MmtciPQYrbGwVyi8r0qysQU7W9wkjFpaPPVHDXh/c1E=,(1,[D@821f10d,0,[D@6c5890a6,[D@2a80b9dc,7,0,0,0,[D@692a3050,[D@50ca0a20))
+(gZKQBkVlDWZVmbDpg4qH7GqeF18yplwzcGoyxw7sMgc=,(0,[D@5ee450,0,[D@55df4060,[D@33fb8aab,30,99,1,0,[D@474cfb36,[D@f00bacc))
+(tLkXAda4d9N3pMfnklDorFvs0njFyMJ0CVmtJGnM5wc=,(0,[D@78e7aec5,29,[D@32834586,[D@48497a52,30,180,1,0,[D@4ffdc291,[D@1cf0e69e))
+(qlOASIVquYjmP8WY+OSOoC/rWgHpPI8w+qmpP11hQ7o=,(1,[D@bb49dea,25,[D@7eeb73a6,[D@13f5d863,30,180,0,0,[D@715155d1,[D@12d94676))
+(rItHIJBeXpxJAbDNI81j+TPZHciZqu+lYYqFPBKaR14=,(0,[D@76a0f6a4,0,[D@41a0c5d4,[D@221c02f5,30,99,1,0,[D@5d063451,[D@4254e18d))
+Churn count: 57644
+NOT Churn count: 818499
+Churn count: 57644
+NOT Churn count: 57142
+nPTs = 34630
+nPDs = 115130
++--------------+-----+--------------------+
+|predictedLabel|label|            features|
++--------------+-----+--------------------+
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[1.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,1.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[1.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[1.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,1.0,...|
+|           1.0|  1.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[1.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,1.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  1.0|[0.0,0.0,0.0,1.0,...|
+|           0.0|  0.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[1.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[0.0,0.0,0.0,0.0,...|
+|           1.0|  1.0|[0.0,0.0,0.0,0.0,...|
+|           0.0|  0.0|[1.0,0.0,0.0,0.0,...|
++--------------+-----+--------------------+
+only showing top 50 rows
+
+Test Error = 0.048570603522956945
+Learned classification tree model:
+DecisionTreeClassificationModel (uid=dtc_74d3fd040552) of depth 5 with 63 nodes
+  If (feature 89 <= 27.0)
+   If (feature 78 in {0.0})
+    If (feature 76 in {1.0})
+     If (feature 89 <= 0.0)
+      If (feature 22 <= 39.0)
+       Predict: 0.0
+      Else (feature 22 > 39.0)
+       Predict: 1.0
+     Else (feature 89 > 0.0)
+      If (feature 0 in {1.0})
+       Predict: 0.0
+      Else (feature 0 not in {1.0})
+       Predict: 0.0
+    Else (feature 76 not in {1.0})
+     If (feature 75 in {1.0})
+      If (feature 95 <= 29.0)
+       Predict: 1.0
+      Else (feature 95 > 29.0)
+       Predict: 0.0
+     Else (feature 75 not in {1.0})
+      If (feature 92 <= 0.0)
+       Predict: 0.0
+      Else (feature 92 > 0.0)
+       Predict: 0.0
+   Else (feature 78 not in {0.0})
+    If (feature 76 in {1.0})
+     If (feature 89 <= 0.0)
+      If (feature 95 <= 0.0)
+       Predict: 0.0
+      Else (feature 95 > 0.0)
+       Predict: 1.0
+     Else (feature 89 > 0.0)
+      If (feature 70 in {1.0})
+       Predict: 0.0
+      Else (feature 70 not in {1.0})
+       Predict: 0.0
+    Else (feature 76 not in {1.0})
+     If (feature 92 <= 30.0)
+      If (feature 75 in {1.0})
+       Predict: 1.0
+      Else (feature 75 not in {1.0})
+       Predict: 0.0
+     Else (feature 92 > 30.0)
+      If (feature 73 <= 30.0)
+       Predict: 1.0
+      Else (feature 73 > 30.0)
+       Predict: 0.0
+  Else (feature 89 > 27.0)
+   If (feature 76 in {1.0})
+    If (feature 23 in {0.0})
+     If (feature 93 <= 30.958333333333332)
+      If (feature 17 in {1.0})
+       Predict: 0.0
+      Else (feature 17 not in {1.0})
+       Predict: 0.0
+     Else (feature 93 > 30.958333333333332)
+      If (feature 60 in {1.0})
+       Predict: 0.0
+      Else (feature 60 not in {1.0})
+       Predict: 0.0
+    Else (feature 23 not in {0.0})
+     If (feature 61 in {1.0})
+      If (feature 12 in {1.0})
+       Predict: 0.0
+      Else (feature 12 not in {1.0})
+       Predict: 1.0
+     Else (feature 61 not in {1.0})
+      If (feature 88 in {1.0})
+       Predict: 0.0
+      Else (feature 88 not in {1.0})
+       Predict: 0.0
+   Else (feature 76 not in {1.0})
+    If (feature 75 in {0.0})
+     If (feature 78 in {0.0})
+      If (feature 96 <= 4.666666666666667)
+       Predict: 0.0
+      Else (feature 96 > 4.666666666666667)
+       Predict: 0.0
+     Else (feature 78 not in {0.0})
+      If (feature 92 <= 30.0)
+       Predict: 0.0
+      Else (feature 92 > 30.0)
+       Predict: 1.0
+    Else (feature 75 not in {0.0})
+     If (feature 95 <= 0.0)
+      If (feature 78 in {0.0})
+       Predict: 1.0
+      Else (feature 78 not in {0.0})
+       Predict: 1.0
+     Else (feature 95 > 0.0)
+      If (feature 70 in {1.0})
+       Predict: 1.0
+      Else (feature 70 not in {1.0})
+       Predict: 1.0
+
