@@ -16,124 +16,17 @@ import org.apache.spark.mllib.stat.Statistics
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.classification.DecisionTreeClassifier
+import org.apache.spark.ml.classification.RandomForestClassificationModel
+import org.apache.spark.ml.classification.RandomForestClassifier
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
 import org.apache.spark.sql.functions.rand
 import scala.util.Random
 import scala.collection.mutable.ListBuffer
+import org.apache.spark.mllib.classification.{SVMModel, SVMWithSGD}
+import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 
 object pa_final {
-  // DateTime transformer
-  val format = new java.text.SimpleDateFormat("yyyyMMdd")
-  def get_days(a: String, b:String): Double = {
-    val t1 = format.parse (a)
-    val t2 = format.parse (b)
-    (t1.getTime - t2.getTime) / (1000 * 60 * 60 * 24)
-  }
-
-  def get_svd(list: ListBuffer[Double], mean: Double): Double ={
-    list.map( x => (x-mean)*(x-mean))
-    Math.sqrt(list.sum / list.length)
-  }
-  // val test = List((1231,0), (1220,0), (1201,1), (1129, 0), (1115, 1), (1102,0), (1005,1))
-
-  // return (index of (is_renew == 1 && is_cancel == 0))
-  def renew_index(index: Int, list: List[(String, String, String, String, String)]): (Int) = {
-    if (index > list.length - 1) index
-    else if (list(index)._2 == "1" && list(index)._5 == "0") index
-    else renew_index(index + 1, list)
-  }
-
-  def suspension_index(index: Int, list: List[(String, String, String, String, String)]): (Int) = {
-    if (index > list.length - 1) index
-    else if (list(index)._2 == "0" || list(index)._5 == "1") index
-    else suspension_index(index + 1, list)
-  }
-
-  // return (renew, renew_avg, renew_svd)
-  def get_renews(list: List[(String, String, String, String, String)]): List[Double]={
-    var index = 1
-    var renew_list_buffer = new ListBuffer[Double]()
-    var cur = list.head
-    while( index < list.length){
-      val next_index = renew_index(index, list)
-      if (next_index < list.length){
-        renew_list_buffer += get_days(cur._3, list(next_index)._3)
-        cur = list(next_index)
-        index = next_index + 1
-      }else{
-        index = next_index + 1
-      }
-    }
-
-    if (renew_list_buffer.isEmpty){
-      renew_list_buffer += 0
-    }
-    val renew_mean = renew_list_buffer.sum / renew_list_buffer.length
-    val renew_svd = get_svd(renew_list_buffer, renew_mean)
-    List(renew_list_buffer.head, renew_mean, renew_svd)
-  }
-
-  def get_suspensions(list: List[(String, String, String, String, String)]): List[Double]={
-    var index = 1
-    var suspension_list_buffer = new ListBuffer[Double]()
-    var cur = list.head
-    while( index < list.length){
-      val next_index = suspension_index(index, list)
-      if (next_index < list.length){
-        suspension_list_buffer += get_days(cur._3, list(next_index)._3)
-        cur = list(next_index)
-        index = next_index + 1
-      }else{
-        index = next_index + 1
-      }
-    }
-
-    if (suspension_list_buffer.isEmpty){
-      suspension_list_buffer += 0
-    }
-
-    val suspension_mean = suspension_list_buffer.sum / suspension_list_buffer.length
-    val suspension_svd = get_svd(suspension_list_buffer, suspension_mean)
-    List(suspension_list_buffer.head, suspension_mean, suspension_svd)
-  }
-
-  def get_expires(list: List[(String, String, String, String, String)]): List[Double]={
-    var index = 1
-    var expire_list_buffer = new ListBuffer[Double]()
-    var cur = list.head
-    while( index < list.length){
-      val next_index = renew_index(index, list)
-      // find previous expiration date > current transaction date
-      if (next_index < list.length){
-        if (get_days(list(next_index)._4, cur._3) > 0) {
-          expire_list_buffer += get_days(list(next_index)._4, cur._3)
-          cur = list(next_index)
-          index = next_index + 1
-        } else {
-          index = next_index + 1
-        }
-      }else{
-        index = next_index + 1
-      }
-    }
-
-    if( expire_list_buffer.isEmpty){
-      expire_list_buffer += 0
-    }
-
-    val expire_mean = expire_list_buffer.sum / expire_list_buffer.length
-    val expire_svd = get_svd(expire_list_buffer, expire_mean)
-    List(expire_list_buffer.head, expire_mean, expire_svd)
-  }
-
-  // return (renew, renew_avg, renew_svd, suspension, suspension_avg, suspension_svd, expire, expire_avg, expire_svd)
-  def get_tuple(list: List[(String, String, String, String, String)]): List[Any] ={
-    //get_renews(list):::get_suspensions(list):::get_expires(list)
-    //get_renews(list):::get_suspensions(list)
-    get_renews(list)
-  }
-
   def main(args: Array[String]) {
     val sc = new SparkContext(new SparkConf().setAppName("PA Final"))
 
@@ -308,19 +201,20 @@ object pa_final {
         y
       }
     }
-    
-    /*
-    val FeatureRdd4_1 = transactionRddClean1.map(_.split(",")).map(line => (line(0), line(5), line(6), line(7), line(8))).keyBy(_._1).groupByKey()
 
-    println("Features 4 size: " + FeatureRdd4_1.count())
-    val FeatureRdd4_2 = FeatureRdd4_1.mapValues(iter => iter.toList.sortWith(_._3 > _._3))
-
-    println("Features 4 size: " + FeatureRdd4_2.count())
-    val FeatureRdd4_3 = FeatureRdd4_2.map( x => (x._1, get_tuple(x._2)))
-    println("Features 4 size: " + FeatureRdd4_3.count())
-    */
-    //use msno to join tables
-    //val combinedFeatures = FeatureRdd2.join(FeatureRdd1).join(FeatureRdd3_Unique).join(FeatureRdd4_3)
+    // map user_logs data to (msno, avg_p25, avg_p50, avg_p75, avg_p985, avg_p100, avg_unique, avg_total_second)
+    val FeatureRdd4 = userLogsRddClean1.map{line => val data = line.split(",")
+      (data(0), (data(2).toDouble, data(3).toDouble, data(4).toDouble, data(5).toDouble, data(6).toDouble, data(7).toDouble, data(8).toDouble))
+    }
+    val FeatureRdd4_1 = FeatureRdd4.mapValues(line => (line, 1.0))
+    val FeatureRdd4_2 = FeatureRdd4_1.reduceByKey{(x, y) => 
+      ((x._1._1 + y._1._1, x._1._2 + y._1._2, x._1._3 + y._1._3, x._1._4 + y._1._4, x._1._5 + y._1._5, x._1._6 + y._1._6, x._1._7 + y._1._7), x._2 + y._2)
+    }
+    // avg features seems useless, only add total seconds played and log counts into our features
+    val FeatureRdd4_3 = FeatureRdd4_2.map{line => val data = line
+      //(data._1, (data._2._1._1 / data._2._2, data._2._1._2 / data._2._2, data._2._1._3 / data._2._2, data._2._1._4 / data._2._2, data._2._1._5 / data._2._2, data._2._1._6 / data._2._2, data._2._1._7 / data._2._2, data._2._1._7, data._2._2))
+      (data._1, (data._2._1._7, data._2._2))
+    }
 
     val combinedFeatures0 = FeatureRdd2.join(FeatureRdd1)
     val combinedFeatures1 = combinedFeatures0.map{line => val data = line
@@ -347,11 +241,27 @@ object pa_final {
       (data._1, (data._2._1._1, data._2._1._2, data._2._1._3, data._2._1._4, data._2._1._5, data._2._1._6, data._2._1._7, data._2._1._8,data._2._1._9, data._2._1._10, sparse))
     }
 
-    var combinedFeaturesCount = combinedFeatures5.count()
-    println("combined count = " + combinedFeaturesCount)
-    combinedFeatures5.take(5).foreach(println)
+    val combinedFeatures6 = combinedFeatures5.join(FeatureRdd4_3)
+    val combinedFeatures7 = combinedFeatures6.map{line => val data = line
+      var sparse = Array.fill[Double](7)(0.0)
+      sparse(0) = data._2._2._1.toDouble
+      sparse(1) = data._2._2._2.toDouble
+      /*sparse(2) = data._2._2._3.toDouble
+      sparse(3) = data._2._2._4.toDouble
+      sparse(4) = data._2._2._5.toDouble
+      sparse(5) = data._2._2._6.toDouble
+      sparse(6) = data._2._2._7.toDouble
+      sparse(7) = data._2._2._8.toDouble
+      sparse(8) = data._2._2._9.toDouble*/
+   
+      (data._1, (data._2._1._1, data._2._1._2, data._2._1._3, data._2._1._4, data._2._1._5, data._2._1._6, data._2._1._7, data._2._1._8,data._2._1._9, data._2._1._10, data._2._1._11, sparse))
+    }
 
-    val combinedFeatures = combinedFeatures5
+    var combinedFeaturesCount = combinedFeatures7.count()
+    println("combined count = " + combinedFeaturesCount)
+
+    val combinedFeatures = combinedFeatures7
+    combinedFeatures.take(5).foreach(println)
 
     val churnRdd = combinedFeatures.filter(line => line._2._1.toInt == 1).count()
     val notChurnRdd = combinedFeatures.filter(line => line._2._1.toInt == 0).count()
@@ -391,21 +301,26 @@ object pa_final {
       val v7 = Vectors.dense(data._2._8.toDouble) //is_auto_renew 1, 76
       val v8 = Vectors.dense(data._2._9.toDouble) //is_cancel 1, 77
       val v9 = Vectors.dense(data._2._10.toArray) //month 12, 89
-
       val v10 = Vectors.dense(data._2._11.toArray) //special features1 9, 98 
+      val v11 = Vectors.dense(data._2._12.toArray) //user logs features 9, 105
 
       var y = data._2._1.toInt
-      val features = Vectors.dense(v1.toArray ++ v2.toArray ++ v3.toArray ++ v4.toArray ++ v5.toArray ++ v6.toArray ++ v7.toArray ++ v8.toArray ++ v9.toArray ++ v10.toArray)
+      val features = Vectors.dense(v1.toArray ++ v2.toArray ++ v3.toArray ++ v4.toArray ++ v5.toArray ++ v6.toArray ++ v7.toArray ++ v8.toArray ++ v9.toArray ++ v10.toArray ++ v11.toArray)
       LabeledPoint(y, features)
     }.cache()
+    val scaler = new StandardScaler(withMean = true, withStd = true).fit(data.map(x => x.features))
+    val scaledData = data.map(x =>
+      LabeledPoint(x.label, scaler.transform(Vectors.dense(x.features.toArray)))).cache()
     val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
-    val Array(trainData, testData) = data.randomSplit(Array(0.7, 0.3))
+    //val Array(trainData, testData) = data.randomSplit(Array(0.7, 0.3))
+    val Array(trainData, testData) = scaledData.randomSplit(Array(0.7, 0.3))
     val pointsTrainDf = sqlContext.createDataFrame(trainData)
     val pointsTrainDs = pointsTrainDf.as[LabeledPoint]
     val pointsTestDf = sqlContext.createDataFrame(testData)
     val pointsTestDs = pointsTestDf.as[LabeledPoint]
-    val pointsDf = sqlContext.createDataFrame(data)
+    //val pointsDf = sqlContext.createDataFrame(data)
+    val pointsDf = sqlContext.createDataFrame(scaledData)
     val pointsDs = pointsDf.as[LabeledPoint]
 
     var nPTs = pointsTestDs.count()
@@ -414,7 +329,7 @@ object pa_final {
     println("nPDs = " + nPDs)
 
     /* FINISH PREPARING DATA */
-
+    
     /* DECISION TREE */
     val labelIndexer = new StringIndexer()
       .setInputCol("label")
@@ -434,6 +349,7 @@ object pa_final {
     val dt = new DecisionTreeClassifier()
       .setLabelCol("indexedLabel")
       .setFeaturesCol("indexedFeatures")
+      .setMaxDepth(5)//default value is 5
 
     // Convert indexed labels back to original labels.
     val labelConverter = new IndexToString()
@@ -447,12 +363,21 @@ object pa_final {
 
     // Train model. This also runs the indexers.
     val model = pipeline.fit(pointsTrainDf)
+   
+    val predictionsTrain = model.transform(pointsTrainDf)
+    val evaluatorTrain = new MulticlassClassificationEvaluator()
+      .setLabelCol("indexedLabel")
+      .setPredictionCol("prediction")
+      .setMetricName("precision")
+    val accuracyTrain = evaluatorTrain.evaluate(predictionsTrain)
+    println("Train Error = " + (1.0 - accuracyTrain))
+
 
     // Make predictions.
     val predictions = model.transform(pointsTestDf)
 
     // Select example rows to display.
-    predictions.select("predictedLabel", "label", "features").show(50)
+    //predictions.select("predictedLabel", "label", "features").show(50)
 
     // Select (prediction, true label) and compute test error.
     val evaluator = new MulticlassClassificationEvaluator()
@@ -464,9 +389,84 @@ object pa_final {
 
     val treeModel = model.stages(2).asInstanceOf[DecisionTreeClassificationModel]
     println("Learned classification tree model:\n" + treeModel.toDebugString)
-    
+     
     /* FINISH RUNNING DECISION TREE */
-       
+    /* RANDOM FOREST */
+    
+    val rfLabelIndexer = new StringIndexer()
+      .setInputCol("label")
+      .setOutputCol("indexedLabel")
+      .fit(pointsDf)
+    val rfFeatureIndexer = new VectorIndexer()
+      .setInputCol("features")
+      .setOutputCol("indexedFeatures")
+      .setMaxCategories(4)
+      .fit(pointsDf)
+
+    // Train a DecisionTree model.
+    val rf = new RandomForestClassifier()
+      .setLabelCol("indexedLabel")
+      .setFeaturesCol("indexedFeatures")
+      .setNumTrees(10)
+
+    // Convert indexed labels back to original labels.
+    val rfLabelConverter = new IndexToString()
+      .setInputCol("prediction")
+      .setOutputCol("predictedLabel")
+      .setLabels(rfLabelIndexer.labels)
+
+    // Chain indexers and tree in a Pipeline.
+    val rfPipeline = new Pipeline()
+      .setStages(Array(rfLabelIndexer, rfFeatureIndexer, rf, rfLabelConverter))
+
+    // Train model. This also runs the indexers.
+    val rfModel = rfPipeline.fit(pointsTrainDf)
+   
+    val rfPredictionsTrain = rfModel.transform(pointsTrainDf)
+    val rfEvaluatorTrain = new MulticlassClassificationEvaluator()
+      .setLabelCol("indexedLabel")
+      .setPredictionCol("prediction")
+      .setMetricName("precision")
+    val rfAccuracyTrain = rfEvaluatorTrain.evaluate(rfPredictionsTrain)
+    println("RF Train Error = " + (1.0 - rfAccuracyTrain))
+
+
+    // Make predictions.
+    val rfPredictions = rfModel.transform(pointsTestDf)
+
+    // Select (prediction, true label) and compute test error.
+    val rfEvaluator = new MulticlassClassificationEvaluator()
+      .setLabelCol("indexedLabel")
+      .setPredictionCol("prediction")
+      .setMetricName("precision")
+    val rfAccuracy = rfEvaluator.evaluate(rfPredictions)
+    println("RF Test Error = " + (1.0 - rfAccuracy))
+    val rfDrawModel = rfModel.stages(2).asInstanceOf[RandomForestClassificationModel]
+    println("Learned classification forest model:\n" + rfDrawModel.toDebugString)
+    
+    /* FINISH RUNNING RANDOM FOREST */
+
+    /* SVM */
+    val svmNumIterations = 200
+    val svmModel = SVMWithSGD.train(trainData, svmNumIterations)
+    svmModel.clearThreshold()
+    val svmScoreAndLabels = testData.map{point =>
+      val score = svmModel.predict(point.features)
+      (score, point.label)
+    }
+    svmScoreAndLabels.take(10).foreach(println)
+    val metrics = new BinaryClassificationMetrics(svmScoreAndLabels)
+    val auROC = metrics.areaUnderROC()
+    println("SVM area under ROC = " + auROC)
+    val svmAcc = svmScoreAndLabels.filter{line => val x = line
+      if((x._1 >= 0 && x._2 == 1) || (x._1 < 0 && x._2 == 0))
+        true
+      else
+        false
+    }.count().toDouble / svmScoreAndLabels.count().toDouble
+    println("SVM Test Error = " + (1.0 - svmAcc))
+
+    /* FINISH RUNNING SVM */
     sc.stop()
   }
 }
