@@ -1,8 +1,9 @@
-In this project, we analyzed the the data from KKbox and predicted whether an user will churn after a short period (i.e. 30 days) from the expiration of the current service subscription. We pre-processed the data and uncovered predictive features from it. Then we applied some of the classification algorithms to train the models, evaluated the performance and analyzed their discrepancies. By tuning these models, we made best prediction by Decision Tree model and got high prediction accuracy at 95.2%. More detail please refer to [report](https://github.com/Predictive-Analysis-2017/kkbox_churn_prediction/blob/master/Churn%20prediction%20for%20KKBOX%20music%20streaming%20service.pdf)
-
 # kkbox_churn_prediction
 * Course project of Predictive Analysis 2017 Fall NYU
 * The data set is from Kaggle [WSDM - KKBox's Churn Prediction Challenge](https://www.kaggle.com/c/kkbox-churn-prediction-challenge)
+
+In this project, we analyzed the the data from KKbox and predicted whether an user will churn after a short period (i.e. 30 days) from the expiration of the current service subscription. We pre-processed the data and uncovered predictive features from it. Then we applied some of the classification algorithms to train the models, evaluated the performance and analyzed their discrepancies. By tuning these models, we made best prediction by Decision Tree model and got high prediction accuracy at 95.2%. More detail please refer to [report](https://github.com/Predictive-Analysis-2017/kkbox_churn_prediction/blob/master/Churn%20prediction%20for%20KKBOX%20music%20streaming%20service.pdf)
+
 ## Attribute Selection
 #### transaction.csv (last transaction of each member)
 - payment_method
